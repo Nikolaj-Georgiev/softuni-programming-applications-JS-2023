@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <input type="text" name="title" id="title" />
+    <button id="add-movie">Add Movie</button>
+    <button id="load-btn">Load Movies</button>
+    <ul id="movie-list"></ul>
+
+
+    <script>
+        let loadBtn = document.querySelector('#load-btn');
+        let movieList = document.querySelector('#movie-list');
+        let baseUrl = 'http://localhost:3030/jsonstore/';
+
+        loadBtn.addEventListener('click', () => {
+            movieList.innerHTML = '';
+            fetch(`${baseUrl}movies`)
+                .then(res => res.json())
+                .then(date =>
+                    Object.values(date)
+                        .forEach(movie => {
+                            const movieName = document.createElement('li');
+                            movieName.textContent = movie.title;
+                            movieList.appendChild(movieName);
+                        })
+                )
+                .catch(err => console.log(err));
+        });
+
+        const addBtn = document.querySelector('#add-movie');    
+        addBtn.addEventListener('click', () => {
+            let inputMovie = document.querySelector('#title');
+            let title = inputMovie.value;
+            fetch(`${baseUrl}movies`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ title })
+            })
+                .then(res => res.json())
+                .then(movie => {
+                    const newMovie = document.createElement('li');
+                    newMovie.textContent = movie.title;
+                    movieList.appendChild(newMovie);
+                })
+                .catch(err => console.log(err));
+        })
+
+
+    </script>
+
+</body>
+
+</html>
