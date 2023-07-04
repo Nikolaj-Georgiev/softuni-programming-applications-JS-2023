@@ -13,9 +13,10 @@ function loadRepos() {
 				ulRepos.appendChild(li);
 			});
 		})
+		.catch(err => console.log(err));
 
 
-	function createLi(name, url){
+	function createLi(name, url) {
 		let li = document.createElement('li');
 		let a = document.createElement('a');
 		a.textContent = name;
