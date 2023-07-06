@@ -114,7 +114,7 @@ function attachEvents() {
             })
             .catch(error => {
                 // divForecast.textContent = 'Error';         
-                divLabel.textContent = 'Error'
+                divLabel.textContent = 'Error';
             })
     })
 
