@@ -56,7 +56,7 @@ document.querySelector('form').addEventListener('submit', async (ev) => {
         const token = respData.accessToken;
         sessionStorage.setItem('accessToken', token);
 
-        window.location = '/03-remote-data-and-authentication/coockBook-2/';
+        window.location = './index.html';
         
     } catch (err) {
         alert(err.message)

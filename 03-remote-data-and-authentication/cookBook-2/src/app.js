@@ -58,8 +58,8 @@ window.addEventListener('load', async () => {
             }
         });
     
-        sessionStorage.removeItem(token);
-        window.location = '/03-remote-data-and-authentication/coockBook-2/login.html';
+        sessionStorage.removeItem('accessToken', token);
+        window.location = './login.html';
     })
 
     const main = document.querySelector('main');

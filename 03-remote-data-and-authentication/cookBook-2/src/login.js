@@ -30,7 +30,7 @@ async function onSubmit(ev){
 
         sessionStorage.setItem('accessToken', token);
 
-        window.location = '/03-remote-data-and-authentication/coockBook-2/index.html';
+        window.location = './index.html';
         
     } catch (error) {
         alert(error.message)

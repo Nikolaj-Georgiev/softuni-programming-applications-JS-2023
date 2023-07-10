@@ -17,7 +17,7 @@ async function onCreate(e) {
     const token = sessionStorage.getItem('accessToken');
     if (token == null) {
         alert('Please login!')
-        window.location = '/03-remote-data-and-authentication/coockBook-2/login.html';
+        window.location = './login.html';
         return;
     }
 
@@ -40,7 +40,7 @@ async function onCreate(e) {
         }
 
         await res.json();
-        window.location = '/03-remote-data-and-authentication/coockBook-2/index.html';
+        window.location = './index.html';
 
 
     } catch (error) {
