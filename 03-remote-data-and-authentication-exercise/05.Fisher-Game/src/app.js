@@ -17,6 +17,7 @@ const addBtn = document.querySelector('button.add');
 const divCatches = document.querySelector('div#catches');
 divCatches.replaceChildren();
 const fieldSet = document.querySelector('#main');
+fieldSet.style.display = 'none';
 addForm.addEventListener('submit', onAdd);
 addForm.reset();
 
@@ -26,6 +27,7 @@ if (sessionStorage.accessToken != null) {
     console.log(sessionStorage.getItem('email'));
     pEmail.firstElementChild.textContent = sessionStorage.getItem('email');
     addBtn.disabled = false;
+    onLoad();
 }
 
 async function onLoad() {
@@ -36,7 +38,7 @@ async function onLoad() {
             throw new Error(err.message);
         }
         const data = await res.json();
-        console.log(data);
+        fieldSet.style.display = 'inline-block';
 
         const catches = data.map(createCatch);
         divCatches.replaceChildren(...catches);
