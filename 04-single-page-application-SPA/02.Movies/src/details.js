@@ -9,14 +9,19 @@ export function detailsPage(id) {
 
 async function displayMovie(id) {
     section.replaceChildren(spinner());
+    const user = JSON.parse(localStorage.getItem('user'));
 
-    const movie = await getMovie(id);
+    const [movie, likes, ownLike] = await Promise.all([
+        getMovie(id),
+        getLikes(id),
+        getOwnLike(id, user)
+    ])
 
-    section.replaceChildren(createMovieCard(movie));
+    section.replaceChildren(createMovieCard(movie, user, likes, ownLike));
 }
 
-function createMovieCard(movie) {
-   
+function createMovieCard(movie, user, likes, ownLike) {
+
     const element = document.createElement('div');
     element.className = 'container';
     element.innerHTML = `
@@ -29,26 +34,30 @@ function createMovieCard(movie) {
     <div class="col-md-4 text-center">
         <h3 class="my-3 ">Movie Description</h3>
         <p>${movie.description}</p>
-        ${createControls(movie)}
+        ${createControls(movie, user, ownLike)}
+        <span class="enrolled-span">Liked ${likes}</span>
     </div>
 </div>`;
-
+    const likeBtn = element.querySelector('.like-btn');
+    if (likeBtn) {
+        likeBtn.addEventListener('click', (e) => likeMovie(e, movie._id))
+    }
     return element;
 }
 
-function createControls(movie) {
-    const user = JSON.parse(localStorage.getItem('user'));
-    const isOwner = user && user._id === movie._ownerId;
+function createControls(movie, user, ownLike) {
+    const isOwner = user && user._id == movie._ownerId;
+
+    let controls = [];
 
     if (isOwner) {
-        return `
-        <a class="btn btn-danger" href="#">Delete</a>
-        <a class="btn btn-warning" href="#">Edit</a>`;
-    } else {
-        return `
-        <a class="btn btn-primary" href="#">Like</a> 
-        <span class="enrolled-span">Liked 1</span>`;
+        controls.push(`<a class="btn btn-danger" href="#">Delete</a>`)
+        controls.push(`<a class="btn btn-warning" href="#">Edit</a>`);
+    } else if (user && ownLike == false) {
+        controls.push(`<a class="btn btn-primary like-btn" href="#">Like</a> `)
     }
+
+    return controls.join('');
 }
 
 async function getMovie(id) {
@@ -68,9 +77,74 @@ async function getMovie(id) {
     }
 }
 
+async function getLikes(id) {
+    try {
+        const res = await fetch(`http://localhost:3030/data/likes?where=movieId%3D%22${id}%22&distinct=_ownerId&count`);
+        if (res.ok != true) {
+            const err = await res.json();
+            throw new Error(err.message);
+        }
+
+        const likes = res.json();
+        return likes;
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+async function getOwnLike(movieId, user) {
+    if (!user) {
+        return false;
+    } else {
+        const userId = user._id;
+        try {
+            const res = await fetch(`http://localhost:3030/data/likes?where=movieId%3D%22${movieId}%22%20and%20_ownerId%3D%22${userId}%22`);
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.message);
+            }
+
+            const ownLike = res.json();
+            return ownLike.length > 0
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+}
+
+
+async function likeMovie(e, movieId){
+    e.preventDefault();
+    
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    try {
+        const res = await fetch('http://localhost:3030/data/likes', {
+            method: 'POST',
+            headers:{
+                'Content-Type': 'application/json',
+                'X-Authorization': user.accessToken
+            },
+            body: JSON.stringify({movieId})
+        })
+
+        if (res.ok != true) {
+            const err = await res.json();
+            throw new Error(err.message)
+        }
+
+        detailsPage(movieId);
+    } catch (error) {
+        alert(error.message)
+    }
+    
+}
+
+
+
 // ${isOwner ? `
 // <a class="btn btn-danger" href="#">Delete</a>
 // <a class="btn btn-warning" href="#">Edit</a>` : `
-// <a class="btn btn-primary" href="#">Like</a> 
+// <a class="btn btn-primary" href="#">Like</a>
 // <span class="enrolled-span">Liked 1</span>`
 // } - mnogo qk operator, ama s funkciq e po-qko
