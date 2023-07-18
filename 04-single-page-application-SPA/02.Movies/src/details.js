@@ -34,8 +34,7 @@ function createMovieCard(movie, user, likes, ownLike) {
     <div class="col-md-4 text-center">
         <h3 class="my-3 ">Movie Description</h3>
         <p>${movie.description}</p>
-        ${createControls(movie, user, ownLike)}
-        <span class="enrolled-span">Liked ${likes}</span>
+        ${createControls(movie, user, likes, ownLike)}
     </div>
 </div>`;
     const likeBtn = element.querySelector('.like-btn');
@@ -45,7 +44,7 @@ function createMovieCard(movie, user, likes, ownLike) {
     return element;
 }
 
-function createControls(movie, user, ownLike) {
+function createControls(movie, user, likes, ownLike) {
     const isOwner = user && user._id == movie._ownerId;
 
     let controls = [];
@@ -53,8 +52,11 @@ function createControls(movie, user, ownLike) {
     if (isOwner) {
         controls.push(`<a class="btn btn-danger" href="#">Delete</a>`)
         controls.push(`<a class="btn btn-warning" href="#">Edit</a>`);
+        controls.push(`<span class="enrolled-span">Liked ${likes}</span>`)
     } else if (user && ownLike == false) {
         controls.push(`<a class="btn btn-primary like-btn" href="#">Like</a> `)
+    } else if (user && ownLike) {
+        controls.push(`<span class="enrolled-span">Liked ${likes}</span>`)
     }
 
     return controls.join('');
@@ -104,7 +106,7 @@ async function getOwnLike(movieId, user) {
                 throw new Error(err.message);
             }
 
-            const ownLike = res.json();
+            const ownLike = await res.json();
             return ownLike.length > 0
         } catch (error) {
             alert(error.message);
